@@ -6,17 +6,9 @@ tablero[1] = new Array(4);
 tablero[2] = new Array(4);
 tablero[3] = new Array(4);
 
-var n2;
-var n4;
-var n8;
-var n16;
-var n32;
-var n64;
-var n128;
-var n256;
-var n512;
-var n1024;
-var n2048;
+var aleatorio;
+var corx;
+var cory;
 
 var jugar = {
   preload: function() {
@@ -35,7 +27,7 @@ var jugar = {
   },
   create: function() {
     tablero = juego.add.tileSprite( 0, 0, 400, 400, "fondo" );
-    n2 = juego.add.tileSprite( 22, 22, 78, 78, "num2" );
+    /*n2 = juego.add.tileSprite( 22, 22, 78, 78, "num2" );
     n4 = juego.add.tileSprite( 115, 22, 78, 78, "num4" );
     n8 = juego.add.tileSprite( 207, 22, 78, 78, "num8" );
     n16 = juego.add.tileSprite( 300, 22, 78, 78, "num16" );
@@ -45,9 +37,23 @@ var jugar = {
     n256 = juego.add.tileSprite( 300, 115, 78, 78, "num256" );
     n512 = juego.add.tileSprite( 22, 207, 78, 78, "num512" );
     n1024 = juego.add.tileSprite( 115, 207, 78, 78, "num1024" );
-    n2048 = juego.add.tileSprite( 207, 207, 78, 78, "num2048" );
+    n2048 = juego.add.tileSprite( 207, 207, 78, 78, "num2048" );*/
   },
   update: function() {
+    //Numero entero aleatorio entre 1 y 2
+    aleatorio = Math.floor( (Math.random() * 2 ) + 1 );
+    //Numero entero aleatorio entre 0 y 3, luego se consigue la ubicacion en pixeles de la casilla escogida (De 0 a 3) (Coordenada en x).
+    corx = ( Math.floor( Math.random() * 4 ) * 93 ) + 22;
+    //Numero entero aleatorio entre 0 y 3, luego se consigue la ubicacion en pixeles de la casilla escogida (De 0 a 3) (Coordenada en y).
+    cory = ( Math.floor( Math.random() * 4 ) * 93 ) + 22;
+
+    if (aleatorio == 1){
+      //Aniadir cuadro "2"
+      juego.add.tileSprite( corx, cory, 78, 78, "num2" );
+    } else {
+      //Aniadir cuadro "4"
+      juego.add.tileSprite( corx, cory, 78, 78, "num4" );
+    }
 
   }
 };
