@@ -1,4 +1,4 @@
-﻿//Tablero 4x4
+//Tablero 4x4
 var tablero = new Array(4);
 for (var i = 0; i < 4; i++){
   tablero[i] = new Array(4);
@@ -131,3 +131,4 @@ var jugar = {
     tablero[((corx - 22) / 93)][((cory - 22) / 93)] = aleatorio * 2;
   }
 }
+
