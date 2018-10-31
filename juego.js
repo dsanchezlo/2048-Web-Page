@@ -1,4 +1,4 @@
-//Tablero 4x4
+﻿//Tablero 4x4
 var tablero = new Array(4);
 for (var i = 0; i < 4; i++){
   tablero[i] = new Array(4);
@@ -16,6 +16,17 @@ var aleatorio = Math.floor( (Math.random() * 2 ) + 1 );
 //Numero entero aleatorio entre 0 y 3, luego se consigue la ubicacion en pixeles de la casilla escogida (De 0 a 3) (Coordenada en "x" y en "y").
 var corx = ( Math.floor( Math.random() * 4 ) * 93 ) + 22;
 var cory = ( Math.floor( Math.random() * 4 ) * 93 ) + 22;
+
+var fArriba;
+var fDerecha;
+var fAbajo;
+var fIzquierda;
+
+//Guarda la tecla que se presionó
+var presArriba;
+var presDerecha;
+var presAbajo;
+var presIzquierda;
 
 var jugar = {
 
@@ -36,38 +47,62 @@ var jugar = {
   },
 
   create: function() {
+    fArriba = juego.input.keyboard.addKey( Phaser.Keyboard.UP );
+    fDerecha = juego.input.keyboard.addKey( Phaser.Keyboard.RIGHT );
+    fAbajo = juego.input.keyboard.addKey( Phaser.Keyboard.DOWN );
+    fIzquierda = juego.input.keyboard.addKey( Phaser.Keyboard.LEFT );
+
     juego.add.tileSprite( 0, 0, 400, 400, "fondo" );
 
-    //Añadir 2 o 4
-    if (aleatorio == 1){
-      juego.add.tileSprite( corx, cory, 78, 78, "num2" );
-    } else {
-      juego.add.tileSprite( corx, cory, 78, 78, "num4" );
-    }
+    this.valoresRandom();
+    this.nuevoBloque();
+    
+    this.valoresRandom();
+    this.nuevoBloque();
 
-    //Ocupar el espacio en la matriz interna del número añadido.
-    tablero[((corx - 22) / 93)][((cory - 22) / 93)] = aleatorio * 2;
   },
 
   update: function() {
-    //Revisar si ya está llena la matriz
-    var flag = false;
-    for (var i = 0; i < 4; i++){
-      for (var j = 0; j < 4; j++){
-        if (tablero [i][j] == 0){
-          flag = true;
+    presArriba = fArriba.downDuration(1);
+    presDerecha = fDerecha.downDuration(1);
+    presAbajo = fAbajo.downDuration(1);
+    presIzquierda = fIzquierda.downDuration(1);
+    
+    if ( presArriba || presDerecha || presAbajo || presIzquierda){
+      //Revisar si ya está llena la matriz
+      var flag = false;
+      for (var i = 0; i < 4; i++){
+        for (var j = 0; j < 4; j++){
+          if (tablero [i][j] == 0){
+            flag = true;
+          }
         }
       }
-    }
 
-    //Si todavía hay espacio, seguir jugando.
-    if ( flag == true ){
-      this.valoresRandom();
+      //Si todavía hay espacio, seguir jugando.
+      if ( flag == true ){
 
-      //Añade un 2 o un 4
-      this.bloqueRandom();
-    } else {
-      juego.state.start( "finJuego");
+        if ( presArriba ){
+
+        }
+        if ( presDerecha ){
+
+        }
+        if ( presAbajo ){
+
+        }
+        if ( presIzquierda ){
+
+        }
+
+        this.valoresRandom();
+        //Añade un bloque (Dos o cuatro)
+        this.nuevoBloque();
+
+
+      } else {
+        juego.state.start( "finJuego");
+      }
     }
   },
 
@@ -85,14 +120,14 @@ var jugar = {
 
   },
 
-  bloqueRandom: function(){
+  nuevoBloque: function(){
 
-    if (aleatorio == 1){
-      juego.add.tileSprite( corx, cory, 78, 78, "num2" );
+    if (aleatorio == 1 ){
+      juego.add.tileSprite( corx, cory, 78, 78, "num2");
     } else {
-      juego.add.tileSprite( corx, cory, 78, 78, "num4" );
+      juego.add.tileSprite( corx, cory, 78, 78, "num4");
     }
-    tablero[((corx - 22) / 93)][((cory - 22) / 93)] = aleatorio * 2;
 
+    tablero[((corx - 22) / 93)][((cory - 22) / 93)] = aleatorio * 2;
   }
 }
