@@ -1,14 +1,13 @@
-//Tablero 4x4
+﻿//Tablero 4x4
 var tablero = new Array(4);
 for (var i = 0; i < 4; i++){
   tablero[i] = new Array(4);
 }
 
-//Llenar de espacio vacios (Ceros) el arreglo interno
+//Espacio para almacenar los sprites 
+var sprites = new Array(4);
 for (var i = 0; i < 4; i++){
-  for (var j = 0; j < 4; j++){
-    tablero[i][j] = '0';
-  }
+  sprites[i] = new Array(4);
 }
 
 //Numero entero aleatorio entre 1 y 2
@@ -27,6 +26,9 @@ var presArriba;
 var presDerecha;
 var presAbajo;
 var presIzquierda;
+
+//Llevará el tiempo
+var relog
 
 var jugar = {
 
@@ -55,12 +57,29 @@ var jugar = {
 
     juego.add.tileSprite( 0, 0, 400, 400, "fondo" );
 
-    this.valoresRandom();
-    this.nuevoBloque();
+    
+    //Llenar de espacio vacios (Ceros) el arreglo interno
+    for (var i = 0; i < 4; i++){
+      for (var j = 0; j < 4; j++){
+        tablero[i][j] = '0';
+      }
+    }
+
+    //Llenar con Ceros el arreglo (No hay ningún sprite todavía)
+    for (var i = 0; i < 4; i++){
+      for (var j = 0; j < 4; j++){
+        sprites[i][j] = juego.add.sprite( ((i * 93) + 22), ((i * 93) + 22), "num0");
+      }
+    }
 
     this.valoresRandom();
     this.nuevoBloque();
 
+    this.valoresRandom();
+    this.nuevoBloque();
+    /*
+    relog = juego.time.create( false );
+    relog.start();*/
   },
 
   update: function() {
@@ -68,8 +87,15 @@ var jugar = {
     presDerecha = fDerecha.downDuration(1);
     presAbajo = fAbajo.downDuration(1);
     presIzquierda = fIzquierda.downDuration(1);
-
+/*
+ if ( presArriba || presDerecha || presAbajo || presIzquierda){
+    for (var i = 0; i < 93; i++){
+      sprites[((corx - 22) / 93)][((cory - 22) / 93)].x += 1;
+      relog.add(1000);
+    }
+}*/
     if ( presArriba || presDerecha || presAbajo || presIzquierda){
+
       //Revisar si ya está llena la matriz
       var flag = false;
       for (var i = 0; i < 4; i++){
@@ -91,53 +117,90 @@ var jugar = {
                 contador++;
               } else if (contador >= 1){
                 tablero[i][j - contador] = tablero[i][j];
-                juego.add.tileSprite( ((i * 93) + 22) , (((j - contador) * 93) + 22), 78, 78, "num" + tablero[i][j - contador]);
+                juego.add.sprite( ((i * 93) + 22) , (((j - contador) * 93) + 22), "num" + tablero[i][j - contador]);
                 tablero[i][j] = 0;
-                juego.add.tileSprite( ((i * 93) + 22) , ((j * 93) + 22), 78, 78, "num0");
+                juego.add.sprite( ((i * 93) + 22) , ((j * 93) + 22), "num0");
               }
               if ( ((j - contador - 1) >= 0) && ( tablero[i][j - contador] == tablero[i][j - contador - 1]) ){
                   tablero[i][j - contador - 1] += tablero[i][j - contador];
-                  juego.add.tileSprite( ((i * 93) + 22) , (((j - contador - 1) * 93) + 22), 78, 78, "num" + tablero[i][j - contador - 1]);
+                  juego.add.sprite( ((i * 93) + 22) , (((j - contador - 1) * 93) + 22), "num" + tablero[i][j - contador - 1]);
                   tablero[i][j - contador] = 0;
-                  juego.add.tileSprite( ((i * 93) + 22) , (((j - contador) * 93) + 22), 78, 78, "num0");
+                  juego.add.sprite( ((i * 93) + 22) , (((j - contador) * 93) + 22), "num0");
                   contador++;
               }
             }
           }
         }
         if ( presDerecha ){
-          /*for (var j = 0; j < 4; j++){
+          for (var j = 0; j < 4; j++){
             contador = 0;
             for (var i = 3; i >= 0 ; i--){
               if (tablero[i][j] == 0){
                 contador++;
               } else if (contador >= 1){
                 tablero[i + contador][j] = tablero[i][j];
-                juego.add.tileSprite( (((i + contador) * 93) + 22) , ((j * 93) + 22), 78, 78, "num" + tablero[i + contador][j]);
+                juego.add.sprite( (((i + contador) * 93) + 22) , ((j * 93) + 22), "num" + tablero[i + contador][j]);
                 tablero[i][j] = 0;
-                juego.add.tileSprite( ((i * 93) + 22) , ((j * 93) + 22), 78, 78, "num0");
+                juego.add.sprite( ((i * 93) + 22) , ((j * 93) + 22),"num0");
               }
-              if ( ((i + contador + 1) >= 0) && ( tablero[i + contador][j] == tablero[i + contador + 1][j]) ){
+              if ( ((i + contador + 1) <= 3) && ( tablero[i + contador][j] == tablero[i + contador + 1][j]) ){
                   tablero[i + contador + 1][j] += tablero[i + contador][j];
-                  juego.add.tileSprite( (((i + contador + 1) * 93) + 22) , ((j * 93) + 22), 78, 78, "num" + tablero[i + contador + 1][j]);
+                  juego.add.sprite( (((i + contador + 1) * 93) + 22) , ((j * 93) + 22), "num" + tablero[i + contador + 1][j]);
                   tablero[i + contador][j] = 0;
-                  juego.add.tileSprite( (((i + contador) * 93) + 22) , ((j * 93) + 22), 78, 78, "num0");
+                  juego.add.sprite( (((i + contador) * 93) + 22) , ((j * 93) + 22), "num0");
                   contador++;
               }
             }
-          }*/
+          }
         }
         if ( presAbajo ){
-
+          for (var i = 0; i < 4; i++){
+            contador = 0;
+            for (var j = 3; j >= 0 ; j--){
+              if (tablero[i][j] == 0){
+                contador++;
+              } else if (contador >= 1){
+                tablero[i][j + contador] = tablero[i][j];
+                juego.add.sprite( ((i * 93) + 22) , (((j + contador) * 93) + 22), "num" + tablero[i][j + contador]);
+                tablero[i][j] = 0;
+                juego.add.sprite( ((i * 93) + 22) , ((j * 93) + 22), "num0");
+              }
+              if ( ((j + contador + 1) <= 3) && ( tablero[i][j + contador] == tablero[i][j + contador + 1]) ){
+                  tablero[i][j + contador + 1] += tablero[i][j + contador];
+                  juego.add.sprite( ((i * 93) + 22) , (((j + contador + 1) * 93) + 22), "num" + tablero[i][j + contador + 1]);
+                  tablero[i][j + contador] = 0;
+                  juego.add.sprite( ((i * 93) + 22) , (((j + contador) * 93) + 22), "num0");
+                  contador++;
+              }
+            }
+          }
         }
         if ( presIzquierda ){
-
+          for (var j = 0; j < 4; j++){
+            contador = 0;
+            for (var i = 0; i < 4 ; i++){
+              if (tablero[i][j] == 0){
+                contador++;
+              } else if (contador >= 1){
+                tablero[i - contador][j] = tablero[i][j];
+                juego.add.sprite( (((i - contador) * 93) + 22) , ((j * 93) + 22), "num" + tablero[i - contador][j]);
+                tablero[i][j] = 0;
+                juego.add.sprite( ((i * 93) + 22) , ((j * 93) + 22), "num0");
+              }
+              if ( ((i - contador - 1) >= 0) && ( tablero[i - contador][j] == tablero[i - contador - 1][j]) ){
+                  tablero[i - contador - 1][j] += tablero[i - contador][j];
+                  juego.add.sprite( (((i - contador - 1) * 93) + 22) , ((j * 93) + 22),"num" + tablero[i - contador - 1][j]);
+                  tablero[i - contador][j] = 0;
+                  juego.add.sprite( (((i - contador) * 93) + 22) , ((j * 93) + 22), "num0");
+                  contador++;
+              }
+            }
+          }
         }
 
         this.valoresRandom();
         //Añade un bloque (Dos o cuatro)
         this.nuevoBloque();
-
 
       } else {
         juego.state.start( "finJuego");
@@ -148,7 +211,7 @@ var jugar = {
   valoresRandom: function(){
 
     aleatorio = Math.floor( (Math.random() * 2 ) + 1 );
-    corx = ( Math.floor( Math.random() * 4 ) * 93 ) + 22;
+    corx = ( Math.floor( Math.	random() * 4 ) * 93 ) + 22;
     cory = ( Math.floor( Math.random() * 4 ) * 93 ) + 22;
 
     //Revisar si la coordenada "x" y "y" aleatoria ya está ocupada.
@@ -162,9 +225,9 @@ var jugar = {
   nuevoBloque: function(){
 
     if (aleatorio == 1 ){
-      juego.add.tileSprite( corx, cory, 78, 78, "num2");
+      sprites[((corx - 22) / 93)][((cory - 22) / 93)] = juego.add.sprite( corx, cory, "num2");
     } else {
-      juego.add.tileSprite( corx, cory, 78, 78, "num4");
+      sprites[((corx - 22) / 93)][((cory - 22) / 93)] = juego.add.sprite( corx, cory, "num4");
     }
 
     tablero[((corx - 22) / 93)][((cory - 22) / 93)] = aleatorio * 2;
