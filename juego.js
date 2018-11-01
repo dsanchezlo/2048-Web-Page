@@ -1,4 +1,4 @@
-﻿//Tablero 4x4
+//Tablero 4x4
 var tablero = new Array(4);
 for (var i = 0; i < 4; i++){
   tablero[i] = new Array(4);
@@ -33,6 +33,7 @@ var jugar = {
   preload: function() {
     this.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
     juego.load.image( "fondo"  , "imagenes/tablero.jpg"     );
+    juego.load.image( "num0"   , "imagenes/cuadro_0.png"    );
     juego.load.image( "num2"   , "imagenes/cuadro_2.png"    );
     juego.load.image( "num4"   , "imagenes/cuadro_4.png"    );
     juego.load.image( "num8"   , "imagenes/cuadro_8.png"    );
@@ -56,7 +57,7 @@ var jugar = {
 
     this.valoresRandom();
     this.nuevoBloque();
-    
+
     this.valoresRandom();
     this.nuevoBloque();
 
@@ -67,7 +68,7 @@ var jugar = {
     presDerecha = fDerecha.downDuration(1);
     presAbajo = fAbajo.downDuration(1);
     presIzquierda = fIzquierda.downDuration(1);
-    
+
     if ( presArriba || presDerecha || presAbajo || presIzquierda){
       //Revisar si ya está llena la matriz
       var flag = false;
@@ -81,12 +82,50 @@ var jugar = {
 
       //Si todavía hay espacio, seguir jugando.
       if ( flag == true ){
-
+      var contador = 0;
         if ( presArriba ){
-
+          for (var i = 0; i < 4; i++){
+            contador = 0;
+            for (var j = 0; j < 4; j++){
+              if (tablero[i][j] == 0){
+                contador++;
+              } else if (contador >= 1){
+                tablero[i][j - contador] = tablero[i][j];
+                juego.add.tileSprite( ((i * 93) + 22) , (((j - contador) * 93) + 22), 78, 78, "num" + tablero[i][j - contador]);
+                tablero[i][j] = 0;
+                juego.add.tileSprite( ((i * 93) + 22) , ((j * 93) + 22), 78, 78, "num0");
+              }
+              if ( ((j - contador - 1) >= 0) && ( tablero[i][j - contador] == tablero[i][j - contador - 1]) ){
+                  tablero[i][j - contador - 1] += tablero[i][j - contador];
+                  juego.add.tileSprite( ((i * 93) + 22) , (((j - contador - 1) * 93) + 22), 78, 78, "num" + tablero[i][j - contador - 1]);
+                  tablero[i][j - contador] = 0;
+                  juego.add.tileSprite( ((i * 93) + 22) , (((j - contador) * 93) + 22), 78, 78, "num0");
+                  contador++;
+              }
+            }
+          }
         }
         if ( presDerecha ){
-
+          /*for (var j = 0; j < 4; j++){
+            contador = 0;
+            for (var i = 3; i >= 0 ; i--){
+              if (tablero[i][j] == 0){
+                contador++;
+              } else if (contador >= 1){
+                tablero[i + contador][j] = tablero[i][j];
+                juego.add.tileSprite( (((i + contador) * 93) + 22) , ((j * 93) + 22), 78, 78, "num" + tablero[i + contador][j]);
+                tablero[i][j] = 0;
+                juego.add.tileSprite( ((i * 93) + 22) , ((j * 93) + 22), 78, 78, "num0");
+              }
+              if ( ((i + contador + 1) >= 0) && ( tablero[i + contador][j] == tablero[i + contador + 1][j]) ){
+                  tablero[i + contador + 1][j] += tablero[i + contador][j];
+                  juego.add.tileSprite( (((i + contador + 1) * 93) + 22) , ((j * 93) + 22), 78, 78, "num" + tablero[i + contador + 1][j]);
+                  tablero[i + contador][j] = 0;
+                  juego.add.tileSprite( (((i + contador) * 93) + 22) , ((j * 93) + 22), 78, 78, "num0");
+                  contador++;
+              }
+            }
+          }*/
         }
         if ( presAbajo ){
 
