@@ -4,7 +4,7 @@ for (var i = 0; i < 4; i++){
   tablero[i] = new Array(4);
 }
 
-//Espacio para almacenar los sprites 
+//Espacio para almacenar los sprites
 var sprites = new Array(4);
 for (var i = 0; i < 4; i++){
   sprites[i] = new Array(4);
@@ -27,8 +27,19 @@ var presDerecha;
 var presAbajo;
 var presIzquierda;
 
-//Llevará el tiempo
-var relog
+var xmove;
+var ymove;
+var avance;
+
+//Está llena o nó la matriz
+var flag = true;
+
+//Cuenta los espacios en blanco
+var contador;
+//Almacena la casilla en la que se combinó ( No se puede combinar más de dos veces en la misma casilla )
+var combinar;
+//Dice si se hizo o no un movimiento
+var movimiento = false;
 
 var jugar = {
 
@@ -57,29 +68,18 @@ var jugar = {
 
     juego.add.tileSprite( 0, 0, 400, 400, "fondo" );
 
-    
-    //Llenar de espacio vacios (Ceros) el arreglo interno
+    //Llenar de espacio vacios (Ceros) el arreglo interno y el de sprites
     for (var i = 0; i < 4; i++){
       for (var j = 0; j < 4; j++){
-        tablero[i][j] = '0';
-      }
-    }
-
-    //Llenar con Ceros el arreglo (No hay ningún sprite todavía)
-    for (var i = 0; i < 4; i++){
-      for (var j = 0; j < 4; j++){
-        sprites[i][j] = juego.add.sprite( ((i * 93) + 22), ((i * 93) + 22), "num0");
+        this.nuevoBloque( i, j, 0 );
       }
     }
 
     this.valoresRandom();
-    this.nuevoBloque();
+    this.nuevoBloque( corx, cory, aleatorio * 2 );
 
     this.valoresRandom();
-    this.nuevoBloque();
-    /*
-    relog = juego.time.create( false );
-    relog.start();*/
+    this.nuevoBloque( corx, cory, aleatorio * 2 );
   },
 
   update: function() {
@@ -87,46 +87,37 @@ var jugar = {
     presDerecha = fDerecha.downDuration(1);
     presAbajo = fAbajo.downDuration(1);
     presIzquierda = fIzquierda.downDuration(1);
-/*
- if ( presArriba || presDerecha || presAbajo || presIzquierda){
-    for (var i = 0; i < 93; i++){
-      sprites[((corx - 22) / 93)][((cory - 22) / 93)].x += 1;
-      relog.add(1000);
-    }
-}*/
-    if ( presArriba || presDerecha || presAbajo || presIzquierda){
 
-      //Revisar si ya está llena la matriz
-      var flag = false;
-      for (var i = 0; i < 4; i++){
-        for (var j = 0; j < 4; j++){
-          if (tablero [i][j] == 0){
-            flag = true;
-          }
-        }
-      }
+    if ( presArriba || presDerecha || presAbajo || presIzquierda ){
 
-      //Si todavía hay espacio, seguir jugando.
       if ( flag == true ){
-      var contador = 0;
+      contador = 0;
+      combinar = -1;
+      movimiento = false;
         if ( presArriba ){
           for (var i = 0; i < 4; i++){
             contador = 0;
+            combinar = -1;
             for (var j = 0; j < 4; j++){
               if (tablero[i][j] == 0){
                 contador++;
-              } else if (contador >= 1){
-                tablero[i][j - contador] = tablero[i][j];
-                juego.add.sprite( ((i * 93) + 22) , (((j - contador) * 93) + 22), "num" + tablero[i][j - contador]);
-                tablero[i][j] = 0;
-                juego.add.sprite( ((i * 93) + 22) , ((j * 93) + 22), "num0");
-              }
-              if ( ((j - contador - 1) >= 0) && ( tablero[i][j - contador] == tablero[i][j - contador - 1]) ){
-                  tablero[i][j - contador - 1] += tablero[i][j - contador];
-                  juego.add.sprite( ((i * 93) + 22) , (((j - contador - 1) * 93) + 22), "num" + tablero[i][j - contador - 1]);
-                  tablero[i][j - contador] = 0;
-                  juego.add.sprite( ((i * 93) + 22) , (((j - contador) * 93) + 22), "num0");
+              } else {
+                if (contador >= 1){
+                  //xmove = i;
+                  //ymove = j;
+                  //avance = contador * -1;
+                  this.nuevoBloque( i, j - contador, tablero[i][j]);
+                  this.nuevoBloque( i, j, 0);
+                  movimiento = true;
+                  //this.moverBloque( "v" );
+                }
+                if ( ((j - contador - 1) >= 0) && ( tablero[i][j - contador] ==   tablero[i][j - contador - 1]) && ( j - contador - 1 != combinar ) ){
+                  this.nuevoBloque( i, j - contador - 1, (tablero[i][j - contador - 1] +   tablero[i][j - contador]) );
+                  this.nuevoBloque( i, j - contador, 0);
+                  combinar = j - contador - 1;
                   contador++;
+                  movimiento = true;
+                }
               }
             }
           }
@@ -134,21 +125,23 @@ var jugar = {
         if ( presDerecha ){
           for (var j = 0; j < 4; j++){
             contador = 0;
+            combinar = -1;
             for (var i = 3; i >= 0 ; i--){
               if (tablero[i][j] == 0){
                 contador++;
-              } else if (contador >= 1){
-                tablero[i + contador][j] = tablero[i][j];
-                juego.add.sprite( (((i + contador) * 93) + 22) , ((j * 93) + 22), "num" + tablero[i + contador][j]);
-                tablero[i][j] = 0;
-                juego.add.sprite( ((i * 93) + 22) , ((j * 93) + 22),"num0");
-              }
-              if ( ((i + contador + 1) <= 3) && ( tablero[i + contador][j] == tablero[i + contador + 1][j]) ){
-                  tablero[i + contador + 1][j] += tablero[i + contador][j];
-                  juego.add.sprite( (((i + contador + 1) * 93) + 22) , ((j * 93) + 22), "num" + tablero[i + contador + 1][j]);
-                  tablero[i + contador][j] = 0;
-                  juego.add.sprite( (((i + contador) * 93) + 22) , ((j * 93) + 22), "num0");
+              } else {
+                if (contador >= 1){
+                  this.nuevoBloque( i + contador, j, tablero[i][j]);
+                  this.nuevoBloque( i, j, 0);
+                  movimiento = true;
+                }
+                if ( ((i + contador + 1) <= 3) && ( tablero[i + contador][j] ==   tablero[i + contador + 1][j]) && ( i + contador + 1 != combinar ) ){
+                  this.nuevoBloque( i + contador + 1, j, (tablero[i + contador + 1][j] +   tablero[i + contador][j]));
+                  this.nuevoBloque( i + contador, j, 0);
+                  combinar = i + contador + 1;
                   contador++;
+                  movimiento = true;
+                }
               }
             }
           }
@@ -156,21 +149,23 @@ var jugar = {
         if ( presAbajo ){
           for (var i = 0; i < 4; i++){
             contador = 0;
+            combinar = -1;
             for (var j = 3; j >= 0 ; j--){
               if (tablero[i][j] == 0){
                 contador++;
-              } else if (contador >= 1){
-                tablero[i][j + contador] = tablero[i][j];
-                juego.add.sprite( ((i * 93) + 22) , (((j + contador) * 93) + 22), "num" + tablero[i][j + contador]);
-                tablero[i][j] = 0;
-                juego.add.sprite( ((i * 93) + 22) , ((j * 93) + 22), "num0");
-              }
-              if ( ((j + contador + 1) <= 3) && ( tablero[i][j + contador] == tablero[i][j + contador + 1]) ){
-                  tablero[i][j + contador + 1] += tablero[i][j + contador];
-                  juego.add.sprite( ((i * 93) + 22) , (((j + contador + 1) * 93) + 22), "num" + tablero[i][j + contador + 1]);
-                  tablero[i][j + contador] = 0;
-                  juego.add.sprite( ((i * 93) + 22) , (((j + contador) * 93) + 22), "num0");
+              } else {
+                if (contador >= 1){
+                  this.nuevoBloque( i, j + contador, tablero[i][j]);
+                  this.nuevoBloque( i, j, 0);
+                  movimiento = true;
+                }
+                if ( ((j + contador + 1) <= 3) && ( tablero[i][j + contador] ==   tablero[i][j + contador + 1]) && ( j + contador + 1 != combinar ) ){
+                  this.nuevoBloque( i, j + contador + 1, (tablero[i][j + contador + 1] +   tablero[i][j + contador]) );
+                  this.nuevoBloque( i, j + contador, 0);
+                  combinar = j + contador + 1;
                   contador++;
+                  movimiento = true;
+                }
               }
             }
           }
@@ -178,29 +173,53 @@ var jugar = {
         if ( presIzquierda ){
           for (var j = 0; j < 4; j++){
             contador = 0;
+            combinar = -1;
             for (var i = 0; i < 4 ; i++){
               if (tablero[i][j] == 0){
                 contador++;
-              } else if (contador >= 1){
-                tablero[i - contador][j] = tablero[i][j];
-                juego.add.sprite( (((i - contador) * 93) + 22) , ((j * 93) + 22), "num" + tablero[i - contador][j]);
-                tablero[i][j] = 0;
-                juego.add.sprite( ((i * 93) + 22) , ((j * 93) + 22), "num0");
-              }
-              if ( ((i - contador - 1) >= 0) && ( tablero[i - contador][j] == tablero[i - contador - 1][j]) ){
-                  tablero[i - contador - 1][j] += tablero[i - contador][j];
-                  juego.add.sprite( (((i - contador - 1) * 93) + 22) , ((j * 93) + 22),"num" + tablero[i - contador - 1][j]);
-                  tablero[i - contador][j] = 0;
-                  juego.add.sprite( (((i - contador) * 93) + 22) , ((j * 93) + 22), "num0");
+              } else {
+                if (contador >= 1){
+                  this.nuevoBloque( i - contador, j, tablero[i][j]);
+                  this.nuevoBloque( i, j, 0);
+                  movimiento = true;
+                }
+                if ( ((i - contador - 1) >= 0) && ( tablero[i - contador][j] ==   tablero[i - contador - 1][j]) && ( i - contador - 1 != combinar ) ){
+                  this.nuevoBloque( i - contador - 1, j, (tablero[i - contador - 1][j] +   tablero[i - contador][j]) );
+                  this.nuevoBloque( i - contador, j, 0);
+                  combinar = i - contador - 1;
                   contador++;
+                  movimiento = true;
+                }
               }
             }
           }
         }
+        //Si algo se movió, agregar bloque
+        if ( movimiento == true ){
+          this.valoresRandom();
+          //Añade un bloque (Dos o cuatro)
+          this.nuevoBloque(corx, cory, aleatorio * 2);
+        }
 
-        this.valoresRandom();
-        //Añade un bloque (Dos o cuatro)
-        this.nuevoBloque();
+        flag = false;
+        //Revisar si ya está llena la matriz, y si todavía hay espacio, seguir jugando.
+        for (var i = 0; i < 4; i++){
+          for (var j = 0; j < 4; j++){
+            if (tablero [i][j] == 0){
+              flag = true;
+            }
+          }
+        }
+        //Si la matriz está llena, pero hay cuadros por combinar, seguir jugando.
+        if ( flag == false ){
+          for (var i = 0; i < 4; i++){
+            for (var j = 1; j < 4; j++){
+              if ( tablero[i][j] == tablero[i][j - 1] || tablero[j][i] == tablero[j - 1][i]){
+                flag = true;
+              }
+            }
+          }
+        }
 
       } else {
         juego.state.start( "finJuego");
@@ -222,14 +241,34 @@ var jugar = {
 
   },
 
-  nuevoBloque: function(){
-
-    if (aleatorio == 1 ){
-      sprites[((corx - 22) / 93)][((cory - 22) / 93)] = juego.add.sprite( corx, cory, "num2");
-    } else {
-      sprites[((corx - 22) / 93)][((cory - 22) / 93)] = juego.add.sprite( corx, cory, "num4");
+  nuevoBloque: function( x, y, valor ){
+    if ( x > 3 && y > 3 ){
+      x = (x - 22) / 93;
+      y = (y - 22) / 93;
     }
+    tablero[x][y] = valor;
+    var valorString = "string";
+    valorString = valor;
+    sprites[x][y] = juego.add.sprite( ((x * 93) + 22) , ((y * 93) + 22), "num" + valorString );
+  },
 
-    tablero[((corx - 22) / 93)][((cory - 22) / 93)] = aleatorio * 2;
+  moverBloque: function( dir ){
+    if ( dir == "h" ){
+      juego.time.events.repeat(Phaser.Timer.SECOND / 100000, 20, this.moverHorizontal );
+    } else if ( dir == "v" ){
+      juego.time.events.repeat(Phaser.Timer.SECOND / 100000, 20, this.moverVertical );
+      sprites[xmove][ymove + (avance * -1)] = juego.add.sprite( ((xmove * 93) + 22) , ((ymove * 93) + 22), ("num" + tablero[xmove][ymove]));
+      sprites[xmove][ymove] = juego.add.sprite( ((xmove * 93) + 22) , ((ymove * 93) + 22), "num2048");
+      tablero[xmove][ymove + (avance * -1)] = tablero[xmove][ymove];
+      tablero[xmove][ymove] = 0;
+    }
+  },
+
+  moverHorizontal: function(){
+    sprites[x][y].x += ( 4.65 * avance );
+  },
+
+  moverVertical: function(){
+    sprites[xmove][ymove].y += ( 4.65 * avance );
   }
 }
